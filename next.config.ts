@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["s2.coinmarketcap.com"], // Cho phép ảnh từ CoinMarketCap
+  },
 };
 
 export default nextConfig;
