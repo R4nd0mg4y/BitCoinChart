@@ -1,5 +1,5 @@
 "use client"
-import Main from "@/pages/Main";
+import Main from "@/app/Main";
 import { useTheme } from "@/context/ThemeContext";
 const Page = () => {
   const { isDarkMode } = useTheme();
