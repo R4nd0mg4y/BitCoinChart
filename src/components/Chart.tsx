@@ -7,6 +7,7 @@ import {
   UTCTimestamp,
   HistogramSeries,
   CandlestickData,
+  MouseEventParams
 } from "lightweight-charts";
 import { GetCandles, GetLiveCandle } from "@/utils/fetchApi";
 import { ISeriesApi } from "lightweight-charts";
@@ -47,7 +48,6 @@ const Chart = ({ darkMode = false, cryptoName, timeFrame }: ChartProps) => {
   const [volumeSeries, setVolumeSeries] =
     useState<ISeriesApi<"Histogram"> | null>(null);
   const [price, setPrice] = useState<Price | null>(null);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -146,7 +146,8 @@ const Chart = ({ darkMode = false, cryptoName, timeFrame }: ChartProps) => {
     toolTip.style.borderColor = "#2962FF";
 
     chartContainerRef.current.appendChild(toolTip);
-    chart.subscribeCrosshairMove((param) => {
+
+    const subscibeToolTip = (param: MouseEventParams) => {
       if (
         param.point === undefined ||
         !param.time ||
@@ -168,16 +169,26 @@ const Chart = ({ darkMode = false, cryptoName, timeFrame }: ChartProps) => {
           high: number;
           low: number;
           close: number;
-          time: UTCTimestamp
+          time: UTCTimestamp;
         };
-        
+
         // Format lại tooltip
         toolTip.innerHTML = `
-          <div style="font-size: 14px; margin: 4px 0px; color: black">Open: ${open.toFixed(2)}</div>
-          <div style="font-size: 14px; color: black">High: ${high.toFixed(2)}</div>
-          <div style="font-size: 14px; color: black">Low: ${low.toFixed(2)}</div>
-          <div style="font-size: 14px; color: black">Close: ${close.toFixed(2)}</div>
-          <div style="color: black; margin-top: 4px;">${unixToDate(time*1000)}</div>
+          <div style="font-size: 14px; margin: 4px 0px; color: black">Open: ${open.toFixed(
+            2
+          )}</div>
+          <div style="font-size: 14px; color: black">High: ${high.toFixed(
+            2
+          )}</div>
+          <div style="font-size: 14px; color: black">Low: ${low.toFixed(
+            2
+          )}</div>
+          <div style="font-size: 14px; color: black">Close: ${close.toFixed(
+            2
+          )}</div>
+          <div style="color: black; margin-top: 4px;">${unixToDate(
+            time * 1000
+          )}</div>
         `;
 
         const coordinate = newCandleSeries.priceToCoordinate((high + low) / 2);
@@ -198,15 +209,31 @@ const Chart = ({ darkMode = false, cryptoName, timeFrame }: ChartProps) => {
             : Math.max(
                 0,
                 Math.min(
-                  chartContainerRef.current.clientHeight - toolTipHeight - toolTipMargin,
+                  chartContainerRef.current.clientHeight -
+                    toolTipHeight -
+                    toolTipMargin,
                   coordinate + toolTipMargin
                 )
               );
         toolTip.style.left = shiftedCoordinate + "px";
         toolTip.style.top = coordinateY + "px";
       }
-    });
+    };
+    // Máy tính: Hover để hiển thị
+    chart.subscribeCrosshairMove(subscibeToolTip);
 
+    // Điện thoại: Chạm để hiển thị
+    chart.subscribeClick(subscibeToolTip);
+
+    // Ẩn tooltip khi rời khỏi biểu đồ
+    document.addEventListener(
+      "mouseleave",
+      () => (toolTip.style.display = "none")
+    );
+    document.addEventListener(
+      "touchend",
+      () => (toolTip.style.display = "none")
+    );
     newCandleSeries.setData(chartData);
 
     newVolumeSeries.setData(histogramChartData);
