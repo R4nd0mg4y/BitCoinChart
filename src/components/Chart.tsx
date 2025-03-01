@@ -7,7 +7,6 @@ import {
   UTCTimestamp,
   HistogramSeries,
   CandlestickData,
-  MouseEventParams,
 } from "lightweight-charts";
 import { GetCandles, GetLiveCandle } from "@/utils/fetchApi";
 import { ISeriesApi } from "lightweight-charts";
@@ -42,13 +41,13 @@ const Chart = ({ darkMode = false, cryptoName, timeFrame }: ChartProps) => {
   >([]);
   const wsRef = useRef<WebSocket | null>(null);
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
-  const toolTipRef = useRef<HTMLDivElement | null>(null);
+
   const [candleSeries, setCandleSeries] =
     useState<ISeriesApi<"Candlestick"> | null>(null);
   const [volumeSeries, setVolumeSeries] =
     useState<ISeriesApi<"Histogram"> | null>(null);
   const [price, setPrice] = useState<Price | null>(null);
-  const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
